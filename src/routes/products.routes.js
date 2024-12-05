@@ -11,7 +11,8 @@ const products = JSON.parse(productsData)
 productsRouter.get('/', (req, res) => {
     const { limit } = req.query
     const limitedProducts = products.slice(0, limit)
-    res.status(200).send(limitedProducts)
+    res.status(200).//send(limitedProducts)
+    render('templates/home', {products: limitedProducts, js: 'products.js', css: 'style.css'})
 })
 
 // Obtener un solo producto
@@ -28,15 +29,20 @@ productsRouter.get('/:pid', (req, res) => {
 // Agregar un nuevo producto
 productsRouter.post ('/', async (req,res) => {
     const {title, description, code, price, stock, category} = req.body
+
+    if (!title || !description || !code || !price || !stock || !category) {
+        return res.status(400).send({ error: 'Todos los campos son obligatorios.' })
+    }
+
     const newProduct = {
          id: crypto.randomBytes(10).toString('hex'), //Genera id unico mediante crypto
          title: title,
          description: description,
          code: code,
-         price: price,
-         status: true,
-         stock: stock,
          category: category,
+         price: price,
+         stock: stock,
+         status: true,
          thumbnails: []
     }
     products.push(newProduct)
@@ -48,6 +54,11 @@ productsRouter.post ('/', async (req,res) => {
 productsRouter.put('/:pid', async (req, res) => {
     const id = (req.params.pid)
     const {title, description, code, price, status, stock, category, thumbnails} = req.body
+
+    if (!title || !description || !code || !price || !stock || !category) {
+        return res.status(400).send({ error: 'Todos los campos son obligatorios.' })
+    }
+
     const index = products.findIndex(p => p.id == id)
     if (index != -1) {
         products[index].title = title
